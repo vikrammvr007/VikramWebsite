@@ -1,0 +1,276 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Experience - Admin{% endblock %}
+
+{% block content %}
+<div class="min-vh-100" style="background: var(--bg-primary); padding-top: 2rem;">
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar -->
+      <div class="col-md-3 col-lg-2">
+        <div class="admin-sidebar glass-card p-3">
+          <h5 class="gradient-text mb-4">Admin Panel</h5>
+          <nav class="nav flex-column">
+            <a class="admin-nav-link" href="{{ url_for('admin.dashboard') }}">
+              <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+            </a>
+            <a class="admin-nav-link" href="{{ url_for('admin.edit_profile') }}">
+              <i class="fas fa-user me-2"></i>Profile
+            </a>
+            <a class="admin-nav-link" href="{{ url_for('admin.add_project_route') }}">
+              <i class="fas fa-plus me-2"></i>Add Project
+            </a>
+            <a class="admin-nav-link" href="{{ url_for('admin.add_skill_route') }}">
+              <i class="fas fa-plus me-2"></i>Add Skill
+            </a>
+            <a class="admin-nav-link" href="{{ url_for('admin.add_certification_route') }}">
+              <i class="fas fa-plus me-2"></i>Add Certification
+            </a>
+            <a class="admin-nav-link" href="{{ url_for('admin.add_education_route') }}">
+              <i class="fas fa-plus me-2"></i>Add Education
+            </a>
+            <a class="admin-nav-link active" href="{{ url_for('admin.manage_experience') }}">
+              <i class="fas fa-briefcase me-2"></i>Experience
+            </a>
+            <hr class="my-3">
+            <a class="admin-nav-link" href="{{ url_for('public.index') }}" target="_blank">
+              <i class="fas fa-external-link-alt me-2"></i>View Site
+            </a>
+            <a class="admin-nav-link" href="{{ url_for('admin.logout') }}">
+              <i class="fas fa-sign-out-alt me-2"></i>Logout
+            </a>
+          </nav>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="col-md-9 col-lg-10">
+        <div class="admin-content">
+          <!-- Top Bar -->
+          <div class="admin-topbar">
+            <h2 class="gradient-text mb-0">Manage Experience</h2>
+            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-custom btn-sm">
+              <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+            </a>
+          </div>
+
+          <!-- Flash Messages -->
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                  {{ message }}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
+
+          <!-- Add New Experience -->
+          <div class="glass-card p-4 mb-4">
+            <h5 class="gradient-text mb-3">Add New Experience</h5>
+            <form method="POST" action="{{ url_for('admin.add_experience_route') }}">
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Job Title/Role</label>
+                  <input type="text" name="role" class="form-control form-control-dark" 
+                         placeholder="e.g., Data Engineer" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Company</label>
+                  <input type="text" name="company" class="form-control form-control-dark" 
+                         placeholder="e.g., Avasoft" required>
+                </div>
+              </div>
+              
+              <div class="row">
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Start Year</label>
+                  <input type="number" name="start_year" class="form-control form-control-dark" 
+                         placeholder="2023" min="1990" max="2030">
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">End Year</label>
+                  <input type="number" name="end_year" class="form-control form-control-dark" 
+                         placeholder="2024 (leave empty if current)" min="1990" max="2030">
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Duration</label>
+                  <input type="text" name="duration" class="form-control form-control-dark" 
+                         placeholder="e.g., 1 year">
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-primary-custom">
+                <i class="fas fa-plus me-1"></i>Add Experience
+              </button>
+            </form>
+          </div>
+
+          <!-- Current Experience -->
+          {% if experience %}
+            {% for exp in experience %}
+            <div class="glass-card p-4 mb-4">
+              <div class="d-flex justify-content-between align-items-start mb-3">
+                <div>
+                  <h5 class="text-white mb-1">{{ exp.role }}</h5>
+                  <p class="text-cyan mb-1">{{ exp.company }}</p>
+                  <p class="text-soft small mb-0">
+                    {{ exp.start_year or 'N/A' }} - {{ exp.end_year or 'Present' }}
+                    {% if exp.duration %} | {{ exp.duration }}{% endif %}
+                  </p>
+                </div>
+                <div class="dropdown">
+                  <button class="btn btn-outline-custom btn-sm dropdown-toggle" type="button" 
+                          data-bs-toggle="dropdown">
+                    <i class="fas fa-cog"></i>
+                  </button>
+                  <ul class="dropdown-menu dropdown-menu-dark">
+                    <li>
+                      <a class="dropdown-item" href="#" onclick="toggleEditForm('exp-{{ exp.id }}')">
+                        <i class="fas fa-edit me-2"></i>Edit
+                      </a>
+                    </li>
+                    <li>
+                      <a class="dropdown-item text-danger" 
+                         href="{{ url_for('admin.delete_experience_route', exp_id=exp.id) }}"
+                         onclick="return confirm('Delete this experience?')">
+                        <i class="fas fa-trash me-2"></i>Delete
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <!-- Edit Form (Hidden by default) -->
+              <div id="exp-{{ exp.id }}" class="edit-form" style="display: none;">
+                <form method="POST" action="{{ url_for('admin.edit_experience_route', exp_id=exp.id) }}">
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Job Title/Role</label>
+                      <input type="text" name="role" class="form-control form-control-dark" 
+                             value="{{ exp.role }}" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Company</label>
+                      <input type="text" name="company" class="form-control form-control-dark" 
+                             value="{{ exp.company }}" required>
+                    </div>
+                  </div>
+                  
+                  <div class="row">
+                    <div class="col-md-4 mb-3">
+                      <label class="form-label">Start Year</label>
+                      <input type="number" name="start_year" class="form-control form-control-dark" 
+                             value="{{ exp.start_year or '' }}" min="1990" max="2030">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                      <label class="form-label">End Year</label>
+                      <input type="number" name="end_year" class="form-control form-control-dark" 
+                             value="{{ exp.end_year or '' }}" min="1990" max="2030">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                      <label class="form-label">Duration</label>
+                      <input type="text" name="duration" class="form-control form-control-dark" 
+                             value="{{ exp.duration or '' }}">
+                    </div>
+                  </div>
+
+                  <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary-custom btn-sm">
+                      <i class="fas fa-save me-1"></i>Save Changes
+                    </button>
+                    <button type="button" class="btn btn-outline-custom btn-sm" 
+                            onclick="toggleEditForm('exp-{{ exp.id }}')">
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+                <hr class="my-3">
+              </div>
+
+              <!-- Responsibilities -->
+              <div class="mb-3">
+                <h6 class="text-cyan mb-2">Responsibilities</h6>
+                {% if exp.responsibilities %}
+                  <ul class="list-unstyled">
+                    {% for resp in exp.responsibilities %}
+                    <li class="d-flex justify-content-between align-items-start mb-2">
+                      <span class="text-soft">• {{ resp.description }}</span>
+                      <a href="{{ url_for('admin.delete_responsibility_route', resp_id=resp.id) }}" 
+                         class="btn btn-sm btn-outline-danger ms-2"
+                         onclick="return confirm('Delete this responsibility?')">
+                        <i class="fas fa-times"></i>
+                      </a>
+                    </li>
+                    {% endfor %}
+                  </ul>
+                {% else %}
+                  <p class="text-soft small">No responsibilities added yet.</p>
+                {% endif %}
+                
+                <form method="POST" action="{{ url_for('admin.add_responsibility_route', exp_id=exp.id) }}" 
+                      class="d-flex gap-2">
+                  <input type="text" name="description" class="form-control form-control-dark" 
+                         placeholder="Add a responsibility..." required>
+                  <button type="submit" class="btn btn-primary-custom btn-sm">
+                    <i class="fas fa-plus"></i>
+                  </button>
+                </form>
+              </div>
+
+              <!-- Technologies -->
+              <div>
+                <h6 class="text-cyan mb-2">Technologies Used</h6>
+                {% if exp.technologies %}
+                  <div class="mb-2">
+                    {% for tech in exp.technologies %}
+                    <span class="badge-tool me-1 mb-1">
+                      {{ tech.name }}
+                      <a href="{{ url_for('admin.delete_exp_technology_route', tech_id=tech.id) }}" 
+                         class="ms-1 text-danger"
+                         onclick="return confirm('Remove {{ tech.name }}?')">
+                        <i class="fas fa-times"></i>
+                      </a>
+                    </span>
+                    {% endfor %}
+                  </div>
+                {% else %}
+                  <p class="text-soft small mb-2">No technologies added yet.</p>
+                {% endif %}
+                
+                <form method="POST" action="{{ url_for('admin.add_exp_technology_route', exp_id=exp.id) }}" 
+                      class="d-flex gap-2">
+                  <input type="text" name="name" class="form-control form-control-dark" 
+                         placeholder="Add a technology..." required>
+                  <button type="submit" class="btn btn-primary-custom btn-sm">
+                    <i class="fas fa-plus"></i>
+                  </button>
+                </form>
+              </div>
+            </div>
+            {% endfor %}
+          {% else %}
+            <div class="glass-card p-4 text-center">
+              <i class="fas fa-briefcase fa-3x text-soft mb-3"></i>
+              <h5 class="text-soft">No Experience Added</h5>
+              <p class="text-soft">Add your first work experience using the form above.</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleEditForm(formId) {
+  const form = document.getElementById(formId);
+  if (form.style.display === 'none') {
+    form.style.display = 'block';
+  } else {
+    form.style.display = 'none';
+  }
+}
+</script>
+{% endblock %}

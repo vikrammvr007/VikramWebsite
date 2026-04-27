@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}Add Education - Admin{% endblock %}
+
+{% block content %}
+<div class="min-vh-100" style="background: var(--bg-primary); padding-top: 2rem;">
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar -->
+      <div class="col-md-3 col-lg-2">
+        <div class="admin-sidebar glass-card p-3">
+          <h5 class="gradient-text mb-4">Admin Panel</h5>
+          <nav class="nav flex-column">
+            <a class="admin-nav-link" href="{{ url_for('admin.dashboard') }}">
+              <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+            </a>
+            <a class="admin-nav-link" href="{{ url_for('admin.edit_profile') }}">
+              <i class="fas fa-user me-2"></i>Profile
+            </a>
+            <a class="admin-nav-link" href="{{ url_for('admin.add_project_route') }}">
+              <i class="fas fa-plus me-2"></i>Add Project
+            </a>
+            <a class="admin-nav-link" href="{{ url_for('admin.add_skill_route') }}">
+              <i class="fas fa-plus me-2"></i>Add Skill
+            </a>
+            <a class="admin-nav-link" href="{{ url_for('admin.add_certification_route') }}">
+              <i class="fas fa-plus me-2"></i>Add Certification
+            </a>
+            <a class="admin-nav-link active" href="{{ url_for('admin.add_education_route') }}">
+              <i class="fas fa-plus me-2"></i>Add Education
+            </a>
+            <a class="admin-nav-link" href="{{ url_for('admin.manage_experience') }}">
+              <i class="fas fa-briefcase me-2"></i>Experience
+            </a>
+            <hr class="my-3">
+            <a class="admin-nav-link" href="{{ url_for('public.index') }}" target="_blank">
+              <i class="fas fa-external-link-alt me-2"></i>View Site
+            </a>
+            <a class="admin-nav-link" href="{{ url_for('admin.logout') }}">
+              <i class="fas fa-sign-out-alt me-2"></i>Logout
+            </a>
+          </nav>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="col-md-9 col-lg-10">
+        <div class="admin-content">
+          <!-- Top Bar -->
+          <div class="admin-topbar">
+            <h2 class="gradient-text mb-0">Add Education</h2>
+            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-custom btn-sm">
+              <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+            </a>
+          </div>
+
+          <!-- Flash Messages -->
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                  {{ message }}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
+
+          <div class="row">
+            <div class="col-lg-8">
+              <div class="glass-card p-4">
+                <h5 class="gradient-text mb-4">Education Details</h5>
+                <form method="POST">
+                  <div class="mb-3">
+                    <label class="form-label">Degree/Course</label>
+                    <input type="text" name="degree" class="form-control form-control-dark" 
+                           placeholder="e.g., Bachelor of Engineering in Computer Science" required>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Institution/University</label>
+                    <input type="text" name="institution" class="form-control form-control-dark" 
+                           placeholder="e.g., Anna University" required>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Location</label>
+                      <input type="text" name="place" class="form-control form-control-dark" 
+                             placeholder="e.g., Chennai, Tamil Nadu">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Year</label>
+                      <input type="text" name="year" class="form-control form-control-dark" 
+                             placeholder="e.g., 2020-2024 or 2024">
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Percentage/CGPA</label>
+                      <input type="text" name="percentage" class="form-control form-control-dark" 
+                             placeholder="e.g., 85% or 8.5 CGPA">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Status</label>
+                      <select name="status" class="form-control form-control-dark">
+                        <option value="">Select Status</option>
+                        <option value="Completed">Completed</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Pursuing">Pursuing</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Display Order</label>
+                    <input type="number" name="sort_order" class="form-control form-control-dark" 
+                           value="1" min="1" max="99">
+                    <div class="form-text">Lower numbers appear first (1 = highest priority)</div>
+                  </div>
+
+                  <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary-custom">
+                      <i class="fas fa-plus me-1"></i>Add Education
+                    </button>
+                    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-custom">
+                      Cancel
+                    </a>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <div class="col-lg-4">
+              <div class="glass-card p-4">
+                <h6 class="gradient-text mb-3">Education Guidelines</h6>
+                <div class="small text-soft">
+                  <div class="mb-3">
+                    <strong class="text-cyan">Degree Examples:</strong>
+                    <ul class="mt-1 mb-0">
+                      <li>Bachelor of Engineering</li>
+                      <li>Master of Science</li>
+                      <li>Diploma in Computer Science</li>
+                      <li>Higher Secondary Certificate</li>
+                    </ul>
+                  </div>
+                  
+                  <div class="mb-3">
+                    <strong class="text-cyan">Year Format:</strong>
+                    <ul class="mt-1 mb-0">
+                      <li>Single year: "2024"</li>
+                      <li>Range: "2020-2024"</li>
+                      <li>Expected: "2024 (Expected)"</li>
+                    </ul>
+                  </div>
+
+                  <div class="mb-3">
+                    <strong class="text-cyan">Percentage/Grade:</strong>
+                    <ul class="mt-1 mb-0">
+                      <li>Percentage: "85%"</li>
+                      <li>CGPA: "8.5/10"</li>
+                      <li>Grade: "First Class"</li>
+                    </ul>
+                  </div>
+
+                  <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-1"></i>
+                    <strong>Tip:</strong> Add education in reverse chronological order (most recent first) by setting appropriate sort order.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}Add Skill - Admin{% endblock %}
+
+{% block content %}
+<div class="min-vh-100" style="background: var(--bg-primary); padding-top: 2rem;">
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar -->
+      <div class="col-md-3 col-lg-2">
+        <div class="admin-sidebar glass-card p-3">
+          <h5 class="gradient-text mb-4">Admin Panel</h5>
+          <nav class="nav flex-column">
+            <a class="admin-nav-link" href="{{ url_for('admin.dashboard') }}">
+              <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+            </a>
+            <a class="admin-nav-link" href="{{ url_for('admin.edit_profile') }}">
+              <i class="fas fa-user me-2"></i>Profile
+            </a>
+            <a class="admin-nav-link" href="{{ url_for('admin.add_project_route') }}">
+              <i class="fas fa-plus me-2"></i>Add Project
+            </a>
+            <a class="admin-nav-link active" href="{{ url_for('admin.add_skill_route') }}">
+              <i class="fas fa-plus me-2"></i>Add Skill
+            </a>
+            <a class="admin-nav-link" href="{{ url_for('admin.add_certification_route') }}">
+              <i class="fas fa-plus me-2"></i>Add Certification
+            </a>
+            <a class="admin-nav-link" href="{{ url_for('admin.add_education_route') }}">
+              <i class="fas fa-plus me-2"></i>Add Education
+            </a>
+            <a class="admin-nav-link" href="{{ url_for('admin.manage_experience') }}">
+              <i class="fas fa-briefcase me-2"></i>Experience
+            </a>
+            <hr class="my-3">
+            <a class="admin-nav-link" href="{{ url_for('public.index') }}" target="_blank">
+              <i class="fas fa-external-link-alt me-2"></i>View Site
+            </a>
+            <a class="admin-nav-link" href="{{ url_for('admin.logout') }}">
+              <i class="fas fa-sign-out-alt me-2"></i>Logout
+            </a>
+          </nav>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="col-md-9 col-lg-10">
+        <div class="admin-content">
+          <!-- Top Bar -->
+          <div class="admin-topbar">
+            <h2 class="gradient-text mb-0">Add Skill</h2>
+            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-custom btn-sm">
+              <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+            </a>
+          </div>
+
+          <!-- Flash Messages -->
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                  {{ message }}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
+
+          <div class="row">
+            <!-- Add New Category -->
+            <div class="col-md-6">
+              <div class="glass-card p-4 mb-4">
+                <h5 class="gradient-text mb-3">Add New Category</h5>
+                <form method="POST">
+                  <input type="hidden" name="action" value="add_category">
+                  <div class="mb-3">
+                    <label class="form-label">Category Name</label>
+                    <input type="text" name="category_name" class="form-control form-control-dark" 
+                           placeholder="e.g., Web Development" required>
+                  </div>
+                  <button type="submit" class="btn btn-primary-custom">
+                    <i class="fas fa-plus me-1"></i>Add Category
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            <!-- Add New Skill -->
+            <div class="col-md-6">
+              <div class="glass-card p-4 mb-4">
+                <h5 class="gradient-text mb-3">Add New Skill</h5>
+                <form method="POST">
+                  <div class="mb-3">
+                    <label class="form-label">Category</label>
+                    <select name="category_id" class="form-control form-control-dark" required>
+                      <option value="">Select Category</option>
+                      {% for category in categories %}
+                      <option value="{{ category.id }}">{{ category.name }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Skill Name</label>
+                    <input type="text" name="name" class="form-control form-control-dark" 
+                           placeholder="e.g., React.js" required>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Proficiency (%)</label>
+                    <input type="number" name="percentage" class="form-control form-control-dark" 
+                           min="1" max="100" value="80" required>
+                  </div>
+                  <button type="submit" class="btn btn-primary-custom">
+                    <i class="fas fa-plus me-1"></i>Add Skill
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- Current Skills -->
+          <div class="glass-card p-4">
+            <h5 class="gradient-text mb-3">Current Skills</h5>
+            {% if categories %}
+              {% for category in categories %}
+              <div class="mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <h6 class="text-cyan mb-0">{{ category.name }}</h6>
+                  <a href="{{ url_for('admin.delete_skill_category_route', category_id=category.id) }}" 
+                     class="btn btn-sm btn-outline-danger"
+                     onclick="return confirm('Delete category \'{{ category.name }}\' and ALL its skills? This cannot be undone.')">
+                    <i class="fas fa-trash me-1"></i>Delete Category
+                  </a>
+                </div>
+                {% if category.skills %}
+                <div class="row g-2">
+                  {% for skill in category.skills %}
+                  <div class="col-md-4">
+                    <div class="d-flex justify-content-between align-items-center p-2 border rounded">
+                      <span>{{ skill.name }}</span>
+                      <div>
+                        <span class="badge-metric me-2">{{ skill.percentage }}%</span>
+                        <a href="{{ url_for('admin.delete_skill_route', skill_id=skill.id) }}" 
+                           class="btn btn-sm btn-outline-danger"
+                           onclick="return confirm('Delete {{ skill.name }}?')">
+                          <i class="fas fa-trash"></i>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                  {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-soft small">No skills in this category yet.</p>
+                {% endif %}
+              </div>
+              {% endfor %}
+            {% else %}
+            <p class="text-soft">No skill categories found. Add a category first.</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

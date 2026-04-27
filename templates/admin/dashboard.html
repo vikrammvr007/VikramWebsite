@@ -1,0 +1,293 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Portfolio{% endblock %}
+
+{% block content %}
+<div class="min-vh-100" style="background: var(--bg-primary); padding-top: 2rem;">
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar -->
+      <div class="col-md-3 col-lg-2">
+        <div class="admin-sidebar glass-card p-3">
+          <h5 class="gradient-text mb-4">Admin Panel</h5>
+          <nav class="nav flex-column">
+            <a class="admin-nav-link active" href="{{ url_for('admin.dashboard') }}">
+              <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+            </a>
+            <a class="admin-nav-link" href="{{ url_for('admin.edit_profile') }}">
+              <i class="fas fa-user me-2"></i>Profile
+            </a>
+            <a class="admin-nav-link" href="{{ url_for('admin.add_project_route') }}">
+              <i class="fas fa-plus me-2"></i>Add Project
+            </a>
+            <a class="admin-nav-link" href="{{ url_for('admin.add_skill_route') }}">
+              <i class="fas fa-plus me-2"></i>Add Skill
+            </a>
+            <a class="admin-nav-link" href="{{ url_for('admin.add_certification_route') }}">
+              <i class="fas fa-plus me-2"></i>Add Certification
+            </a>
+            <a class="admin-nav-link" href="{{ url_for('admin.add_education_route') }}">
+              <i class="fas fa-plus me-2"></i>Add Education
+            </a>
+            <a class="admin-nav-link" href="{{ url_for('admin.manage_experience') }}">
+              <i class="fas fa-briefcase me-2"></i>Experience
+            </a>
+            <hr class="my-3">
+            <a class="admin-nav-link" href="{{ url_for('public.index') }}" target="_blank">
+              <i class="fas fa-external-link-alt me-2"></i>View Site
+            </a>
+            <a class="admin-nav-link" href="{{ url_for('admin.logout') }}">
+              <i class="fas fa-sign-out-alt me-2"></i>Logout
+            </a>
+          </nav>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="col-md-9 col-lg-10">
+        <div class="admin-content">
+          <!-- Top Bar -->
+          <div class="admin-topbar">
+            <h2 class="gradient-text mb-0">Dashboard Overview</h2>
+            <div>
+              <a href="{{ url_for('public.index') }}" target="_blank" class="btn btn-outline-custom btn-sm me-2">
+                <i class="fas fa-external-link-alt me-1"></i>View Site
+              </a>
+              <a href="{{ url_for('admin.logout') }}" class="btn btn-outline-custom btn-sm">
+                <i class="fas fa-sign-out-alt me-1"></i>Logout
+              </a>
+            </div>
+          </div>
+
+          <!-- Flash Messages -->
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                  {{ message }}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
+
+          <!-- Stats Cards -->
+          <div class="row g-4 mb-4">
+            <div class="col-md-3">
+              <div class="stat-card text-center">
+                <div class="stat-num text-primary">{{ projects|length }}</div>
+                <div class="stat-label">Projects</div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="stat-card text-center">
+                <div class="stat-num text-success">{{ skills|length }}</div>
+                <div class="stat-label">Skill Categories</div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="stat-card text-center">
+                <div class="stat-num text-info">{{ certifications|length }}</div>
+                <div class="stat-label">Certifications</div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="stat-card text-center">
+                <div class="stat-num text-warning">{{ education|length }}</div>
+                <div class="stat-label">Education</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Projects Table -->
+          <div class="glass-card p-4 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="gradient-text mb-0">Projects</h5>
+              <a href="{{ url_for('admin.add_project_route') }}" class="btn btn-primary-custom btn-sm">
+                <i class="fas fa-plus me-1"></i>Add Project
+              </a>
+            </div>
+            
+            {% if projects %}
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>Resume</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for project in projects %}
+                  <tr>
+                    <td>{{ project.title }}</td>
+                    <td><span class="badge-category">{{ project.category }}</span></td>
+                    <td>
+                      <label class="toggle-switch">
+                        <input type="checkbox" {% if project.include_in_resume %}checked{% endif %} 
+                               onchange="window.location.href='{{ url_for('admin.toggle_resume_project_route', project_id=project.id) }}'">
+                        <span class="toggle-slider"></span>
+                      </label>
+                    </td>
+                    <td>
+                      <a href="{{ url_for('admin.edit_project_route', project_id=project.id) }}" class="btn btn-sm btn-outline-custom me-1">
+                        <i class="fas fa-edit"></i>
+                      </a>
+                      <a href="{{ url_for('admin.delete_project_route', project_id=project.id) }}" 
+                         class="btn btn-sm btn-outline-danger"
+                         onclick="return confirm('Are you sure you want to delete this project?')">
+                        <i class="fas fa-trash"></i>
+                      </a>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% else %}
+            <p class="text-soft">No projects found. <a href="{{ url_for('admin.add_project_route') }}">Add your first project</a>.</p>
+            {% endif %}
+          </div>
+
+          <!-- Certifications Table -->
+          <div class="glass-card p-4 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="gradient-text mb-0">Certifications</h5>
+              <a href="{{ url_for('admin.add_certification_route') }}" class="btn btn-primary-custom btn-sm">
+                <i class="fas fa-plus me-1"></i>Add Certification
+              </a>
+            </div>
+            
+            {% if certifications %}
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Platform</th>
+                    <th>Topics</th>
+                    <th>Resume</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for cert in certifications %}
+                  <tr>
+                    <td>{{ cert.name }}</td>
+                    <td>{{ cert.platform }}</td>
+                    <td><span class="badge-metric">{{ cert.topics|length }} topics</span></td>
+                    <td>
+                      <label class="toggle-switch">
+                        <input type="checkbox" {% if cert.include_in_resume %}checked{% endif %} 
+                               onchange="window.location.href='{{ url_for('admin.toggle_resume_certification_route', cert_id=cert.id) }}'">
+                        <span class="toggle-slider"></span>
+                      </label>
+                    </td>
+                    <td>
+                      <a href="{{ url_for('admin.delete_certification_route', cert_id=cert.id) }}" 
+                         class="btn btn-sm btn-outline-danger"
+                         onclick="return confirm('Are you sure you want to delete this certification?')">
+                        <i class="fas fa-trash"></i>
+                      </a>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% else %}
+            <p class="text-soft">No certifications found. <a href="{{ url_for('admin.add_certification_route') }}">Add your first certification</a>.</p>
+            {% endif %}
+          </div>
+
+          <!-- Education Table -->
+          <div class="glass-card p-4 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="gradient-text mb-0">Education</h5>
+              <a href="{{ url_for('admin.add_education_route') }}" class="btn btn-primary-custom btn-sm">
+                <i class="fas fa-plus me-1"></i>Add Education
+              </a>
+            </div>
+            
+            {% if education %}
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Degree</th>
+                    <th>Institution</th>
+                    <th>Year</th>
+                    <th>Grade</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for edu in education %}
+                  <tr>
+                    <td>{{ edu.degree }}</td>
+                    <td>{{ edu.institution }}</td>
+                    <td>{{ edu.year or 'N/A' }}</td>
+                    <td>
+                      {% if edu.percentage %}
+                      <span class="badge-metric">{{ edu.percentage }}</span>
+                      {% else %}
+                      <span class="text-soft">N/A</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      {% if edu.status %}
+                      <span class="badge-category">{{ edu.status }}</span>
+                      {% else %}
+                      <span class="text-soft">N/A</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      <a href="{{ url_for('admin.edit_education_route', edu_id=edu.id) }}" class="btn btn-sm btn-outline-custom me-1">
+                        <i class="fas fa-edit"></i>
+                      </a>
+                      <a href="{{ url_for('admin.delete_education_route', edu_id=edu.id) }}" 
+                         class="btn btn-sm btn-outline-danger"
+                         onclick="return confirm('Are you sure you want to delete this education record?')">
+                        <i class="fas fa-trash"></i>
+                      </a>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% else %}
+            <p class="text-soft">No education records found. <a href="{{ url_for('admin.add_education_route') }}">Add your first education record</a>.</p>
+            {% endif %}
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="glass-card p-4">
+            <h5 class="gradient-text mb-3">Quick Actions</h5>
+            <div class="row g-3">
+              <div class="col-md-4">
+                <a href="{{ url_for('admin.edit_profile') }}" class="btn btn-outline-custom w-100">
+                  <i class="fas fa-user me-2"></i>Edit Profile
+                </a>
+              </div>
+              <div class="col-md-4">
+                <a href="{{ url_for('admin.manage_experience') }}" class="btn btn-outline-custom w-100">
+                  <i class="fas fa-briefcase me-2"></i>Manage Experience
+                </a>
+              </div>
+              <div class="col-md-4">
+                <a href="{{ url_for('public.download_resume') }}" class="btn btn-outline-custom w-100">
+                  <i class="fas fa-download me-2"></i>Download Resume
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

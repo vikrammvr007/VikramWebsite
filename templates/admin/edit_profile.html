@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Profile - Admin{% endblock %}
+
+{% block content %}
+<div class="min-vh-100" style="background: var(--bg-primary); padding-top: 2rem;">
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar -->
+      <div class="col-md-3 col-lg-2">
+        <div class="admin-sidebar glass-card p-3">
+          <h5 class="gradient-text mb-4">Admin Panel</h5>
+          <nav class="nav flex-column">
+            <a class="admin-nav-link" href="{{ url_for('admin.dashboard') }}">
+              <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+            </a>
+            <a class="admin-nav-link active" href="{{ url_for('admin.edit_profile') }}">
+              <i class="fas fa-user me-2"></i>Profile
+            </a>
+            <a class="admin-nav-link" href="{{ url_for('admin.add_project_route') }}">
+              <i class="fas fa-plus me-2"></i>Add Project
+            </a>
+            <a class="admin-nav-link" href="{{ url_for('admin.add_skill_route') }}">
+              <i class="fas fa-plus me-2"></i>Add Skill
+            </a>
+            <a class="admin-nav-link" href="{{ url_for('admin.add_certification_route') }}">
+              <i class="fas fa-plus me-2"></i>Add Certification
+            </a>
+            <a class="admin-nav-link" href="{{ url_for('admin.add_education_route') }}">
+              <i class="fas fa-plus me-2"></i>Add Education
+            </a>
+            <a class="admin-nav-link" href="{{ url_for('admin.manage_experience') }}">
+              <i class="fas fa-briefcase me-2"></i>Experience
+            </a>
+            <hr class="my-3">
+            <a class="admin-nav-link" href="{{ url_for('public.index') }}" target="_blank">
+              <i class="fas fa-external-link-alt me-2"></i>View Site
+            </a>
+            <a class="admin-nav-link" href="{{ url_for('admin.logout') }}">
+              <i class="fas fa-sign-out-alt me-2"></i>Logout
+            </a>
+          </nav>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="col-md-9 col-lg-10">
+        <div class="admin-content">
+          <!-- Top Bar -->
+          <div class="admin-topbar">
+            <h2 class="gradient-text mb-0">Edit Profile</h2>
+            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-custom btn-sm">
+              <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+            </a>
+          </div>
+
+          <!-- Flash Messages -->
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                  {{ message }}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
+
+          <div class="row">
+            <div class="col-lg-8">
+              <div class="glass-card p-4">
+                <h5 class="gradient-text mb-4">Personal Information</h5>
+                <form method="POST">
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Full Name</label>
+                      <input type="text" name="name" class="form-control form-control-dark" 
+                             value="{{ person.name if person else '' }}" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Phone</label>
+                      <input type="text" name="phone" class="form-control form-control-dark" 
+                             value="{{ person.phone if person else '' }}">
+                    </div>
+                  </div>
+                  
+                  <div class="row">
+                    <div class="col-md-8 mb-3">
+                      <label class="form-label">Professional Role</label>
+                      <input type="text" name="role" class="form-control form-control-dark" 
+                             value="{{ person.role if person else '' }}" required>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                      <label class="form-label">Age</label>
+                      <input type="number" name="age" class="form-control form-control-dark" 
+                             value="{{ person.age if person else '' }}" min="18" max="100">
+                    </div>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Professional Summary</label>
+                    <textarea name="summary" class="form-control form-control-dark" rows="4" 
+                              placeholder="Brief description of your professional background...">{{ person.summary if person else '' }}</textarea>
+                  </div>
+
+                  <h6 class="text-cyan mb-3">Social Links</h6>
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">GitHub URL</label>
+                      <input type="url" name="github" class="form-control form-control-dark" 
+                             value="{{ socials.github if socials.github else '' }}" 
+                             placeholder="https://github.com/username">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">LinkedIn URL</label>
+                      <input type="url" name="linkedin" class="form-control form-control-dark" 
+                             value="{{ socials.linkedin if socials.linkedin else '' }}" 
+                             placeholder="https://linkedin.com/in/username">
+                    </div>
+                  </div>
+
+                  <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary-custom">
+                      <i class="fas fa-save me-1"></i>Save Changes
+                    </button>
+                    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-custom">
+                      Cancel
+                    </a>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <div class="col-lg-4">
+              <div class="glass-card p-4">
+                <h6 class="gradient-text mb-3">Profile Preview</h6>
+                <div class="text-center mb-3">
+                  <div class="profile-avatar mx-auto mb-2">
+                    <i class="fas fa-user fa-3x text-cyan"></i>
+                  </div>
+                  <h6 class="text-white">{{ person.name if person else 'Your Name' }}</h6>
+                  <p class="text-soft small">{{ person.role if person else 'Your Role' }}</p>
+                </div>
+                
+                <div class="small">
+                  <div class="d-flex justify-content-between mb-2">
+                    <span class="text-soft">Age:</span>
+                    <span class="text-white">{{ person.age if person and person.age else 'Not set' }}</span>
+                  </div>
+                  <div class="d-flex justify-content-between mb-2">
+                    <span class="text-soft">Phone:</span>
+                    <span class="text-white">{{ person.phone if person and person.phone else 'Not set' }}</span>
+                  </div>
+                  <div class="mb-2">
+                    <span class="text-soft">Summary:</span>
+                    <p class="text-white small mt-1">{{ person.summary[:100] + '...' if person and person.summary and person.summary|length > 100 else (person.summary if person and person.summary else 'No summary set') }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.profile-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--gradient-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+</style>
+{% endblock %}
