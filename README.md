@@ -171,7 +171,7 @@ The application uses the following main tables:
 ## Admin Credentials
 
 - **Email**: vhbrosis@gmail.com
-- **Password**: VikramMvr@2000
+- **Password**: ********
 
 ## Support
 
