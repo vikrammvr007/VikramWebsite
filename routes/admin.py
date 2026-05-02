@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from functools import wraps
+import base64
 from config import ADMIN_EMAIL
 from models.supabase_client import (
     get_person, update_person,
@@ -14,7 +15,7 @@ from models.supabase_client import (
     toggle_resume_project,
     add_project_tool, add_project_metric, add_project_algorithm,
     get_certifications, add_certification, delete_certification,
-    toggle_resume_certification,
+    toggle_resume_certification, update_certification_image,
     add_cert_topic, delete_cert_topic,
     get_education, get_education_by_id, add_education, update_education, delete_education,
     get_soft_skills, add_soft_skill, delete_soft_skill,
@@ -231,11 +232,29 @@ def delete_skill_category_route(category_id):
 @login_required
 def add_certification_route():
     if request.method == "POST":
+        # Handle certificate image upload
+        image_url = None
+        cert_image = request.files.get("cert_image")
+        if cert_image and cert_image.filename:
+            allowed = {"png", "jpg", "jpeg", "gif", "webp"}
+            ext = cert_image.filename.rsplit(".", 1)[-1].lower()
+            if ext in allowed:
+                image_data = cert_image.read()
+                if len(image_data) > 5 * 1024 * 1024:  # 5MB limit
+                    flash("Image too large. Please upload an image under 5MB.", "danger")
+                    return redirect(url_for("admin.add_certification_route"))
+                b64 = base64.b64encode(image_data).decode("utf-8")
+                image_url = f"data:image/{ext};base64,{b64}"
+            else:
+                flash("Invalid file type. Please upload PNG, JPG, GIF, or WEBP.", "danger")
+                return redirect(url_for("admin.add_certification_route"))
+
         res = add_certification({
             "name":       request.form.get("name"),
             "platform":   request.form.get("platform"),
             "duration":   request.form.get("duration"),
             "start_date": request.form.get("start_date") or None,
+            "image_url":  image_url,
         })
         cert_id = res.data[0]["id"]
         # Add topics if provided
@@ -246,6 +265,29 @@ def add_certification_route():
         flash("Certification added.", "success")
         return redirect(url_for("admin.dashboard"))
     return render_template("admin/add_certification.html")
+
+
+@admin_bp.route("/upload-cert-image/<cert_id>", methods=["POST"])
+@login_required
+def upload_cert_image_route(cert_id):
+    cert_image = request.files.get("cert_image")
+    if cert_image and cert_image.filename:
+        allowed = {"png", "jpg", "jpeg", "gif", "webp"}
+        ext = cert_image.filename.rsplit(".", 1)[-1].lower()
+        if ext not in allowed:
+            flash("Invalid file type. Please upload PNG, JPG, GIF, or WEBP.", "danger")
+            return redirect(url_for("admin.dashboard"))
+        image_data = cert_image.read()
+        if len(image_data) > 5 * 1024 * 1024:
+            flash("Image too large. Please upload an image under 5MB.", "danger")
+            return redirect(url_for("admin.dashboard"))
+        b64 = base64.b64encode(image_data).decode("utf-8")
+        image_url = f"data:image/{ext};base64,{b64}"
+        update_certification_image(cert_id, image_url)
+        flash("Certificate image uploaded.", "success")
+    else:
+        flash("No image selected.", "danger")
+    return redirect(url_for("admin.dashboard"))
 
 
 @admin_bp.route("/delete-certification/<cert_id>")

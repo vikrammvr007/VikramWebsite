@@ -124,8 +124,40 @@
                  onerror="this.src='https://ui-avatars.com/api/?name={{ person.name }}&background=58A6FF&color=fff&size=300'"/>
           </div>
           <div class="col-lg-8">
-            <h3 class="fw-bold mb-3">Hello, I'm <span class="gradient-text">{{ person.name }}</span></h3>
-            <p class="text-soft mb-4">{{ person.summary }}</p>
+            <h3 class="fw-bold mb-3"><span class="gradient-text">{{ person.name }}</span></h3>
+            
+            <!-- Personal details grid instead of repeating summary -->
+            <div class="about-details mb-4">
+              <div class="about-detail-item">
+                <span class="about-detail-label"><i class="fas fa-user-tie me-2 text-cyan"></i>Role</span>
+                <span class="about-detail-value">{{ person.role }}</span>
+              </div>
+              {% if person.age %}
+              <div class="about-detail-item">
+                <span class="about-detail-label"><i class="fas fa-birthday-cake me-2 text-cyan"></i>Age</span>
+                <span class="about-detail-value">{{ person.age }} years</span>
+              </div>
+              {% endif %}
+
+              {% for e in emails %}
+              <div class="about-detail-item">
+                <span class="about-detail-label"><i class="fas fa-envelope me-2 text-cyan"></i>Email</span>
+                <span class="about-detail-value">{{ e.email }}</span>
+              </div>
+              {% endfor %}
+              {% if socials.github %}
+              <div class="about-detail-item">
+                <span class="about-detail-label"><i class="fab fa-github me-2 text-cyan"></i>GitHub</span>
+                <a href="{{ socials.github }}" target="_blank" class="about-detail-value text-cyan">{{ socials.github | replace('https://','') }}</a>
+              </div>
+              {% endif %}
+              {% if socials.linkedin %}
+              <div class="about-detail-item">
+                <span class="about-detail-label"><i class="fab fa-linkedin me-2 text-cyan"></i>LinkedIn</span>
+                <a href="{{ socials.linkedin }}" target="_blank" class="about-detail-value text-cyan">LinkedIn Profile</a>
+              </div>
+              {% endif %}
+            </div>
             <div class="row g-3 mb-4">
               <div class="col-6 col-md-3">
                 <div class="stat-card">
@@ -308,8 +340,15 @@
           <div class="cert-card glass-card p-4 text-center h-100"
                data-cert-name="{{ cert.name }}"
                data-cert-platform="{{ cert.platform }}"
-               data-topics='{{ cert.topics | map(attribute="topic") | list | tojson }}'>
+               data-topics='{{ cert.topics | map(attribute="topic") | list | tojson }}'
+               data-image="{{ cert.image_url or '' }}">
             <div class="cert-icon mb-3"><i class="fas fa-medal"></i></div>
+            {% if cert.image_url %}
+            <div class="cert-thumb-wrapper mb-3">
+              <img src="{{ cert.image_url }}" alt="{{ cert.name }} certificate" class="cert-thumb">
+              <div class="cert-thumb-overlay"><i class="fas fa-expand-alt"></i></div>
+            </div>
+            {% endif %}
             <h6 class="fw-bold mb-2">{{ cert.name }}</h6>
             <p class="text-soft small mb-1">{{ cert.platform }}</p>
             {% if cert.duration %}<p class="text-cyan small">{{ cert.duration }}</p>{% endif %}
@@ -396,9 +435,25 @@
         </div>
         <button class="modal-close"><i class="fas fa-times"></i></button>
       </div>
-      <h6 class="mb-3">Topics Covered:</h6>
-      <ul id="modal-topics" class="topic-list"></ul>
+      <!-- Certificate image (shown when available) -->
+      <div id="modal-cert-image-wrap" style="display:none;" class="mb-3 text-center">
+        <img id="modal-cert-image" src="" alt="Certificate" class="cert-modal-img"
+             onclick="openCertFullscreen(this.src)">
+        <p class="text-soft small mt-2"><i class="fas fa-search-plus me-1"></i>Click image to view full size</p>
+      </div>
+      <div id="modal-topics-section">
+        <h6 class="mb-3">Topics Covered:</h6>
+        <ul id="modal-topics" class="topic-list"></ul>
+      </div>
     </div>
+  </div>
+
+  <!-- FULLSCREEN CERTIFICATE IMAGE VIEWER -->
+  <div id="cert-fullscreen" class="cert-fullscreen-overlay" onclick="closeCertFullscreen()">
+    <button class="cert-fullscreen-close" onclick="closeCertFullscreen()">
+      <i class="fas fa-times"></i>
+    </button>
+    <img id="cert-fullscreen-img" src="" alt="Certificate" class="cert-fullscreen-img">
   </div>
 
 {% endblock %}

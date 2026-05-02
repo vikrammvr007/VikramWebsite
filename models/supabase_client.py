@@ -156,6 +156,9 @@ def toggle_resume_certification(cert_id, include):
 def add_certification(data):
     return supabase.table("certifications").insert(data).execute()
 
+def update_certification_image(cert_id, image_url):
+    return supabase.table("certifications").update({"image_url": image_url}).eq("id", cert_id).execute()
+
 def delete_certification(cert_id):
     supabase.table("certification_topics").delete().eq("cert_id", cert_id).execute()
     return supabase.table("certifications").delete().eq("id", cert_id).execute()

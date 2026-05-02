@@ -240,19 +240,35 @@ document.addEventListener('DOMContentLoaded', function() {
   const modalClose = document.querySelector('.modal-close');
   
   certCards.forEach(card => {
-    card.addEventListener('click', () => {
-      const certName = card.getAttribute('data-cert-name');
+    card.addEventListener('click', (e) => {
+      // Don't open topics modal if clicking the thumbnail (opens fullscreen instead)
+      if (e.target.closest('.cert-thumb-wrapper')) return;
+
+      const certName     = card.getAttribute('data-cert-name');
       const certPlatform = card.getAttribute('data-cert-platform');
-      const topics = JSON.parse(card.getAttribute('data-topics') || '[]');
+      const topics       = JSON.parse(card.getAttribute('data-topics') || '[]');
+      const imageUrl     = card.getAttribute('data-image') || '';
       
       // Update modal content
-      document.getElementById('modal-cert-name').textContent = certName;
+      document.getElementById('modal-cert-name').textContent     = certName;
       document.getElementById('modal-cert-platform').textContent = certPlatform;
       
+      // Show/hide certificate image
+      const imgWrap = document.getElementById('modal-cert-image-wrap');
+      const imgEl   = document.getElementById('modal-cert-image');
+      if (imageUrl) {
+        imgEl.src = imageUrl;
+        imgWrap.style.display = 'block';
+      } else {
+        imgWrap.style.display = 'none';
+        imgEl.src = '';
+      }
+
       const topicList = document.getElementById('modal-topics');
       topicList.innerHTML = '';
       
       if (topics.length > 0) {
+        document.getElementById('modal-topics-section').style.display = 'block';
         topics.forEach((topic, index) => {
           const li = document.createElement('li');
           li.className = 'topic-item';
@@ -263,12 +279,23 @@ document.addEventListener('DOMContentLoaded', function() {
           topicList.appendChild(li);
         });
       } else {
+        document.getElementById('modal-topics-section').style.display = imageUrl ? 'none' : 'block';
         topicList.innerHTML = '<li class="topic-item"><span class="text-soft">No topics listed</span></li>';
       }
       
       // Show modal
       modalOverlay.classList.add('active');
     });
+
+    // Thumbnail click → fullscreen
+    const thumb = card.querySelector('.cert-thumb-wrapper');
+    if (thumb) {
+      thumb.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const imageUrl = card.getAttribute('data-image') || '';
+        if (imageUrl) openCertFullscreen(imageUrl);
+      });
+    }
   });
   
   // Close modal
@@ -285,6 +312,29 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
+
+  // ── FULLSCREEN CERTIFICATE VIEWER ─────────────────────────────
+  window.openCertFullscreen = function(src) {
+    const overlay = document.getElementById('cert-fullscreen');
+    const img     = document.getElementById('cert-fullscreen-img');
+    img.src = src;
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  };
+
+  window.closeCertFullscreen = function() {
+    const overlay = document.getElementById('cert-fullscreen');
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+  };
+
+  // Close fullscreen on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeCertFullscreen();
+      if (modalOverlay) modalOverlay.classList.remove('active');
+    }
+  });
   
   // ── BACK TO TOP BUTTON ────────────────────────────────────────
   const backToTop = document.getElementById('back-to-top');

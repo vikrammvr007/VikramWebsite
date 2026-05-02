@@ -1159,3 +1159,212 @@ input:checked + .toggle-slider:before {
     transform: translateY(0);
   }
 }
+
+/* ── CERTIFICATE IMAGE THUMBNAIL ────────────────────────────── */
+.cert-thumb-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.cert-thumb {
+  width: 100%;
+  max-height: 140px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--border-glow);
+  transition: transform 0.3s ease, filter 0.3s ease;
+  display: block;
+}
+
+.cert-thumb-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(139,92,246,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: 8px;
+  font-size: 1.5rem;
+  color: white;
+}
+
+.cert-thumb-wrapper:hover .cert-thumb-overlay {
+  opacity: 1;
+}
+
+.cert-thumb-wrapper:hover .cert-thumb {
+  transform: scale(1.03);
+  filter: brightness(0.8);
+}
+
+/* ── CERTIFICATE MODAL IMAGE ────────────────────────────────── */
+.cert-modal-img {
+  max-width: 100%;
+  max-height: 300px;
+  object-fit: contain;
+  border-radius: 10px;
+  border: 1px solid var(--border-glow);
+  cursor: zoom-in;
+  transition: transform 0.2s ease;
+}
+
+.cert-modal-img:hover {
+  transform: scale(1.02);
+}
+
+/* ── FULLSCREEN CERTIFICATE VIEWER ──────────────────────────── */
+.cert-fullscreen-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.95);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  cursor: zoom-out;
+}
+
+.cert-fullscreen-overlay.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.cert-fullscreen-img {
+  max-width: 92vw;
+  max-height: 92vh;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 0 60px rgba(139,92,246,0.3);
+  animation: zoomIn 0.3s ease;
+}
+
+@keyframes zoomIn {
+  from { transform: scale(0.85); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
+.cert-fullscreen-close {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: white;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  z-index: 100000;
+}
+
+.cert-fullscreen-close:hover {
+  background: rgba(220,53,69,0.8);
+}
+
+/* ── ABOUT DETAILS GRID ─────────────────────────────────────── */
+.about-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.about-detail-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.55rem 1rem;
+  background: rgba(88,166,255,0.05);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  transition: border-color 0.3s ease;
+}
+
+.about-detail-item:hover {
+  border-color: var(--border-glow);
+}
+
+.about-detail-label {
+  font-size: 0.85rem;
+  color: var(--text-soft);
+  min-width: 100px;
+  flex-shrink: 0;
+}
+
+.about-detail-value {
+  font-size: 0.9rem;
+  color: var(--text-main);
+  font-weight: 500;
+  word-break: break-all;
+}
+
+a.about-detail-value:hover {
+  text-decoration: underline;
+}
+
+/* ── CONTACT FORM ───────────────────────────────────────────── */
+.contact-form-wrap {
+  max-width: 460px;
+  background: rgba(13,27,42,0.7);
+  border: 1px solid var(--border-glow);
+  border-radius: 16px;
+  padding: 2rem;
+  text-align: left;
+}
+
+[data-theme="light"] .contact-form-wrap {
+  background: rgba(255,255,255,0.85);
+}
+
+.contact-success-icon {
+  font-size: 3rem;
+  color: var(--accent-green);
+}
+
+.contact-error-icon {
+  font-size: 3rem;
+  color: #f85149;
+}
+
+.contact-email-reveal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(88,166,255,0.08);
+  border: 1px solid var(--border-glow);
+  border-radius: 10px;
+  padding: 1rem 1.5rem;
+  margin-top: 0.5rem;
+}
+
+.contact-revealed-email {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--accent-cyan);
+  word-break: break-all;
+  transition: color 0.2s;
+}
+
+.contact-revealed-email:hover {
+  color: var(--accent-blue);
+  text-decoration: underline;
+}
+
+#contactSubmitBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
